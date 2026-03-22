@@ -1343,9 +1343,15 @@ function sv(){try{localStorage.setItem('ds4s',JSON.stringify(saved.map(r=>r.id))
 function ub(){const b=document.getElementById('cbBadge');b.textContent=saved.length;b.style.display=saved.length?'flex':'none'}
 
 // FLAGGED IMAGES
+const FLAG_BLOB='https://jsonblob.com/api/jsonBlob/019d14d2-4a6b-7407-8112-6f5b8f1a6fd9';
 let flaggedImgs=new Set();
 try{flaggedImgs=new Set(JSON.parse(localStorage.getItem('ds6flag')||'[]'))}catch(e){}
-function svFlags(){try{localStorage.setItem('ds6flag',JSON.stringify([...flaggedImgs]))}catch(e){}}
+function svFlags(){
+  try{localStorage.setItem('ds6flag',JSON.stringify([...flaggedImgs]))}catch(e){}
+  // Sync to cloud
+  const data={flagged:[...flaggedImgs].map(id=>{const r=R.find(x=>x.id===id);return r?{id:r.id,name:r.name,img:r.img}:{id}})};
+  fetch(FLAG_BLOB,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(()=>{})
+}
 function flagImg(){const r=filtered[curIdx];if(!r)return;const b=document.querySelector('.bflag');if(flaggedImgs.has(r.id)){flaggedImgs.delete(r.id);b.classList.remove('flagged')}else{flaggedImgs.add(r.id);b.classList.add('flagged');b.style.transform='scale(1.2)';setTimeout(()=>b.style.transform='',200)}svFlags()}
 function updateFlagBtn(){const b=document.querySelector('.bflag');if(!b)return;const r=filtered[curIdx];b.classList.toggle('flagged',r&&flaggedImgs.has(r.id))}
 function unflagImg(id){flaggedImgs.delete(id);svFlags();renderSaved()}
