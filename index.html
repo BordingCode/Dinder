@@ -11,7 +11,9 @@
 html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 body{display:flex;flex-direction:column;align-items:center;max-width:480px;margin:0 auto;position:relative}
 .header{width:100%;padding:14px 20px 8px;display:flex;align-items:center;justify-content:space-between;z-index:100}
-.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;display:flex;align-items:center;gap:6px}
+.logo-text{background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-icon{flex-shrink:0}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:var(--card);border-top:1px solid var(--dim);z-index:150;padding:6px 0 env(safe-area-inset-bottom,8px)}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;background:none;border:none;color:var(--muted);font-size:10px;font-family:inherit;cursor:pointer;transition:.2s;position:relative}
 .nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
@@ -101,6 +103,10 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 .meal-chip img{width:28px;height:28px;border-radius:6px;object-fit:cover;flex-shrink:0}
 .meal-chip .mx{margin-left:3px;color:var(--muted);font-size:14px;cursor:pointer;padding:0 2px}
 .meal-chip .mx:hover{color:var(--accent)}
+.meal-portions{display:flex;align-items:center;gap:1px;margin-left:auto;margin-right:2px}
+.mp-btn{width:18px;height:18px;border-radius:50%;border:1px solid var(--dim);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit;line-height:1}
+.mp-btn:active{transform:scale(.9);background:var(--dim)}
+.mp-val{font-size:11px;font-weight:700;min-width:14px;text-align:center;color:var(--text)}
 .add-meal{padding:5px 10px;border-radius:8px;border:1.5px dashed var(--dim);background:transparent;color:var(--muted);font-size:10px;cursor:pointer;font-family:inherit}
 /* WEEK NAV */
 .week-nav{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:420px;margin-bottom:12px;gap:8px}
@@ -160,6 +166,8 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 .shop-item{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px;color:#ccc;cursor:pointer}
 .shop-check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;color:transparent}
 .shop-item.done{opacity:.35;text-decoration:line-through}.shop-item.done .shop-check{background:var(--green);border-color:var(--green);color:#fff}
+.recipe-tip{position:absolute;bottom:calc(100% + 4px);left:8px;right:8px;background:var(--card2);border:1px solid var(--dim);border-radius:10px;padding:8px 12px;font-size:11px;color:var(--text);line-height:1.6;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,.4);animation:si .2s ease}
+.recipe-tip strong{color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(4px)}
 .modal-overlay.open{opacity:1;pointer-events:all}
@@ -186,7 +194,7 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 </style>
 </head>
 <body>
-<div class="header"><div class="logo">Dinder</div></div>
+<div class="header"><div class="logo"><svg class="logo-icon" viewBox="0 0 36 52" width="24" height="32"><defs><linearGradient id="flameG" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--gold)"/></linearGradient></defs><g transform="rotate(-18,18,16)"><circle cx="18" cy="16" r="10" fill="none" stroke="#999" stroke-width="2.5"/><rect x="27" y="13" width="12" height="3" rx="1.5" fill="#999" transform="rotate(-5,27,14.5)"/></g><path d="M18 48c-8 0-13-6-13-13 0-8 7-14 9-18 1.5-3 1-6 1-6s3 3 2 7c2-2 3-5 3-8 5 5 11 11 11 17 0 7-5 13-13 13z" fill="url(#flameG)"/><path d="M18 48c-4 0-7-3-7-7 0-5 4-7 5-10 0 0 1 2 0 4 1-1 2-3 2-5 3 3 5 5 5 8 0 5-3 10-5 10z" fill="var(--gold)" opacity=".6"/></svg><span class="logo-text">Dinder</span></div></div>
 
 <div class="screen input-screen" id="scrInput">
   <h1>What's in Your Kitchen?</h1>
@@ -1327,6 +1335,8 @@ function getWeekKey(offset){const d=new Date();d.setDate(d.getDate()+(offset||0)
 function getWeekPlan(){const k=getWeekKey(weekOffset);if(!allPlans[k]){allPlans[k]={};DAYS.forEach(d=>allPlans[k][d]=null)}return allPlans[k]}
 DAYS.forEach(d=>{});
 try{saved=JSON.parse(localStorage.getItem('ds4s')||'[]').map(id=>R.find(r=>r.id===id)).filter(Boolean);favs=new Set(JSON.parse(localStorage.getItem('ds4f')||'[]'));allPlans=JSON.parse(localStorage.getItem('ds5w')||'{}')}catch(e){}
+// Migrate old plan format (bare id) to new format ({id, portions})
+(function(){let ch=false;for(const wk in allPlans)for(const d of DAYS){const v=allPlans[wk][d];if(typeof v==='number'){const rec=R.find(r=>r.id===v);allPlans[wk][d]={id:v,portions:rec?rec.servings:4};ch=true}}if(ch)try{localStorage.setItem('ds5w',JSON.stringify(allPlans))}catch(e){}})();
 function sv(){try{localStorage.setItem('ds4s',JSON.stringify(saved.map(r=>r.id)));localStorage.setItem('ds4f',JSON.stringify([...favs]));localStorage.setItem('ds5w',JSON.stringify(allPlans))}catch(e){}ub()}
 function ub(){const b=document.getElementById('cbBadge');b.textContent=saved.length;b.style.display=saved.length?'flex':'none'}
 
@@ -1342,8 +1352,11 @@ const SKIP=['salt','pepper','olive oil','vegetable oil','water','sugar','brown s
 function im(u,r){const a=norm(u),b=norm(r);if(b.includes(a)||a.includes(b))return true;for(const[k,v]of Object.entries(SYN)){const t=[k,...v.split(',')];if(t.some(x=>norm(x).includes(a)||a.includes(norm(x)))&&t.some(x=>norm(x).includes(b)||b.includes(norm(x))))return true}return false}
 function sc(rec,ui){if(!ui.length)return{s:.5,m:[],x:rec.ing.map(i=>i.n)};let m=[],u=new Set();for(const i of ui)for(let j=0;j<rec.ing.length;j++){if(!u.has(j)&&im(i.name,rec.ing[j].n)){m.push(rec.ing[j].n);u.add(j);break}}const c=rec.ing.filter(i=>!SKIP.includes(i.n.toLowerCase())),cm=m.filter(x=>!SKIP.includes(x.toLowerCase()));return{s:c.length?cm.length/c.length:0,m,x:rec.ing.filter((_,i)=>!u.has(i)).map(i=>i.n)}}
 
+// SHUFFLE
+function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
 // START
-function startSwipe(){userIngs=[];document.querySelectorAll('.ing-row').forEach(r=>{const n=r.querySelector('.ing-name').value.trim();if(n)userIngs.push({name:n})});filters=new Set();document.querySelectorAll('.chip.active').forEach(c=>filters.add(c.dataset.f));maxTime=+document.getElementById('timeR').value;filtered=R.filter(r=>{if(maxTime<120&&r.time>maxTime)return false;for(const f of filters)if(!r.tags.includes(f))return false;return true}).map(r=>{const s=sc(r,userIngs);return{...r,ms:s.s,mi:s.m,mx:s.x}}).sort((a,b)=>b.ms-a.ms);curIdx=0;go('swipe');renderCards()}
+function startSwipe(){userIngs=[];document.querySelectorAll('.ing-row').forEach(r=>{const n=r.querySelector('.ing-name').value.trim();if(n)userIngs.push({name:n})});filters=new Set();document.querySelectorAll('.chip.active').forEach(c=>filters.add(c.dataset.f));maxTime=+document.getElementById('timeR').value;const all=R.filter(r=>{if(maxTime<120&&r.time>maxTime)return false;for(const f of filters)if(!r.tags.includes(f))return false;return true}).map(r=>{const s=sc(r,userIngs);return{...r,ms:s.s,mi:s.m,mx:s.x}});const tiers=[[],[],[]];all.forEach(r=>{const p=r.ms*100;if(p>=60)tiers[0].push(r);else if(p>=30)tiers[1].push(r);else tiers[2].push(r)});filtered=tiers.flatMap(t=>shuffleArray(t));curIdx=0;go('swipe');renderCards()}
 
 // CARDS
 function renderCards(){const st=document.getElementById('cardStack');st.innerHTML='';uF();if(curIdx>=filtered.length){st.innerHTML='<div class="no-res"><div class="big">🍽️</div>No more recipes!<button class="rbtn" onclick="go(\'input\')">← Search again</button></div>';return}for(let i=Math.min(curIdx+1,filtered.length-1);i>=curIdx;i--)st.appendChild(mkCard(filtered[i],i===curIdx))}
@@ -1422,8 +1435,8 @@ function renderWeek(){
     const isToday=dates[i].getTime()===today.getTime();
     row.className='day-row'+(selectedDays.has(day)?' selected':'');
     if(isToday)row.style.borderLeft='3px solid var(--accent)';
-    const rec=wp[day]?R.find(r=>r.id===wp[day]):null;
-    let meals='';if(rec)meals=`<div class="meal-chip" onclick="event.stopPropagation();openDet(R.find(r=>r.id===${rec.id}))"><img src="${rec.img}" alt="">${rec.name}<span class="mx" onclick="event.stopPropagation();rmM('${day}')">×</span></div>`;
+    const entry=wp[day];const rec=entry?R.find(r=>r.id===entry.id):null;
+    let meals='';if(rec)meals=`<div class="meal-chip" onclick="event.stopPropagation();openDet(R.find(r=>r.id===${rec.id}))"><img src="${rec.img}" alt="">${rec.name}<span class="meal-portions" onclick="event.stopPropagation()"><button class="mp-btn" onclick="adjPlanPortion('${day}',-1)">−</button><span class="mp-val">${entry.portions||rec.servings}</span><button class="mp-btn" onclick="adjPlanPortion('${day}',1)">+</button></span><span class="mx" onclick="event.stopPropagation();rmM('${day}')">×</span></div>`;
     row.innerHTML=`<div class="day-head"><span class="day-name">${DN[day]}${isToday?' · <span style="color:var(--accent);font-size:10px">TODAY</span>':''}</span><span class="day-date">${formatDateShort(dates[i])}</span></div><div class="day-meals">${meals}<button class="add-meal" onclick="event.stopPropagation();openPicker('${day}')">+ Add</button></div>`;
     if(selMode)row.onclick=()=>{selectedDays.has(day)?selectedDays.delete(day):selectedDays.add(day);renderWeek();document.getElementById('shopBtn').style.display=selectedDays.size?'':'none'};
     g.appendChild(row);
@@ -1432,15 +1445,21 @@ function renderWeek(){
 function rmM(day){getWeekPlan()[day]=null;sv();renderWeek()}
 function toggleSelMode(){selMode=!selMode;selectedDays.clear();document.getElementById('selBtn').classList.toggle('sel',selMode);document.getElementById('shopBtn').style.display='none';renderWeek()}
 function clearWeek(){const wp=getWeekPlan();DAYS.forEach(d=>wp[d]=null);sv();renderWeek()}
+function adjPlanPortion(day,delta){const wp=getWeekPlan();if(!wp[day])return;wp[day].portions=Math.max(1,Math.min(20,wp[day].portions+delta));sv();renderWeek()}
 
 // PICKER
 function openPicker(day){pickerDay=day;const ov=document.getElementById('pickerOv'),pk=document.getElementById('picker');const dates=getWD();const dayIdx=DAYS.indexOf(day);const dateStr=dates[dayIdx]?formatDateShort(dates[dayIdx]):'';const all=saved.length?saved:R.slice(0,20);pk.innerHTML=`<h3>Meal for ${DN[day]} ${dateStr}</h3><input class="picker-search" placeholder="Search recipes..." oninput="filterPicker(this.value)"><div id="pickerList">${all.map(r=>`<div class="picker-item" onclick="pickR(${r.id})"><img src="${r.img}" alt=""><div><div class="pi-name">${r.name}</div><div class="pi-time">${r.time} min · ${r.diff}</div></div></div>`).join('')}</div>`;ov.classList.add('open')}
 function filterPicker(q){const list=document.getElementById('pickerList');const all=saved.length?saved:R.slice(0,20);const f=all.filter(r=>r.name.toLowerCase().includes(q.toLowerCase()));list.innerHTML=f.map(r=>`<div class="picker-item" onclick="pickR(${r.id})"><img src="${r.img}" alt=""><div><div class="pi-name">${r.name}</div><div class="pi-time">${r.time} min · ${r.diff}</div></div></div>`).join('')||'<div style="text-align:center;color:var(--muted);padding:20px">No matches</div>'}
 function closePicker(){document.getElementById('pickerOv').classList.remove('open')}
-function pickR(id){getWeekPlan()[pickerDay]=id;sv();closePicker();renderWeek()}
+function pickR(id){const rec=R.find(r=>r.id===id);getWeekPlan()[pickerDay]={id,portions:rec?rec.servings:4};sv();closePicker();renderWeek()}
 
 // SHOPPING LIST
-function genShopList(){const wp=getWeekPlan();const days=[...selectedDays].filter(d=>wp[d]);if(!days.length)return alert('Select days with meals!');const ov=document.getElementById('shopOv'),mod=document.getElementById('shopModal');const combined={};days.forEach(d=>{const rec=R.find(r=>r.id===wp[d]);if(rec)rec.ing.forEach(i=>{const k=norm(i.n);if(!combined[k])combined[k]={name:i.n,qty:[],days:[]};combined[k].qty.push(i.q);combined[k].days.push(DN[d])})});const cats={produce:[],protein:[],dairy:[],pantry:[],other:[]};const PW='spinach,tomato,onion,garlic,pepper,carrot,celery,zucchini,cucumber,avocado,lime,lemon,basil,cilantro,parsley,thyme,rosemary,mint,ginger,mushroom,broccoli,bean sprout,cabbage,lettuce,potato,eggplant,cauliflower,orange,green onion,green bean,pea,corn,olive,kale,sweet potato,romaine,snap pea,dill'.split(',');const PR='chicken,beef,lamb,salmon,fish,shrimp,tofu,duck,egg,ground,pork,bacon,tuna,anchovy'.split(',');const DA='cream,cheese,butter,milk,yogurt,parmesan,mozzarella,cheddar,feta,sour cream,ricotta,gruyere'.split(',');for(const[k,v]of Object.entries(combined)){const n=k;if(PW.some(w=>n.includes(w)))cats.produce.push(v);else if(PR.some(w=>n.includes(w)))cats.protein.push(v);else if(DA.some(w=>n.includes(w)))cats.dairy.push(v);else if('salt,pepper,oil,sugar,flour,cornstarch,breadcrumb,seasoning,cumin,paprika,turmeric,oregano,curry,chili,soy sauce,fish sauce,vinegar,honey,paste,broth,wine,mirin,allspice,nutmeg,cinnamon,garam masala,miso,hoisin,bbq sauce,tamarind,vodka,sesame'.split(',').some(w=>n.includes(w)))cats.pantry.push(v);else cats.other.push(v)}const CN={produce:'🥬 Produce',protein:'🥩 Protein',dairy:'🧀 Dairy',pantry:'🫙 Pantry',other:'📦 Other'};let html=`<h2>Shopping List</h2><p class="shop-sub">${getWeekLabel()} — ${days.map(d=>DN[d]).join(', ')}</p>`;for(const[cat,items]of Object.entries(cats)){if(!items.length)continue;html+=`<div class="shop-section"><h4>${CN[cat]}</h4>`;items.forEach(item=>{html+=`<div class="shop-item" onclick="this.classList.toggle('done')"><div class="shop-check">✓</div><span>${item.name} — ${[...new Set(item.qty)].join(' + ')}</span></div>`});html+=`</div>`}mod.innerHTML=html;ov.classList.add('open')}
+function aggregateQty(qtyArr){const unitMap={};const misc=[];for(const q of qtyArr){const clean=q.split(',')[0].trim();const m=clean.match(/^(\d+\.?\d*)\s*(.*)$/);if(m&&m[1]){let num=parseFloat(m[1]);let unit=m[2].trim().toLowerCase()||'pcs';if(unit==='kg'){num*=1000;unit='g'}if(unit==='l'){num*=1000;unit='ml'}unitMap[unit]=(unitMap[unit]||0)+num}else{if(!misc.includes(q))misc.push(q)}}const parts=[];for(const[unit,total]of Object.entries(unitMap)){let d;if(unit==='g'&&total>=1000)d=+(total/1000).toFixed(2)+'kg';else if(unit==='ml'&&total>=1000)d=+(total/1000).toFixed(2)+'l';else d=(total%1===0?total:+total.toFixed(1))+(unit==='pcs'?'':unit);parts.push(d)}return[...parts,...misc].join(' + ')}
+function genShopList(){const wp=getWeekPlan();const days=[...selectedDays].filter(d=>wp[d]);if(!days.length)return alert('Select days with meals!');const ov=document.getElementById('shopOv'),mod=document.getElementById('shopModal');const combined={};days.forEach(d=>{const entry=wp[d];const rec=R.find(r=>r.id===entry.id);if(rec){const portions=entry.portions||rec.servings;rec.ing.forEach(i=>{const k=norm(i.n);const sq=scaleQty(i.q,rec.servings,portions);if(!combined[k])combined[k]={name:i.n,qty:[],days:[],recipes:[]};combined[k].qty.push(sq);combined[k].days.push(DN[d]);if(!combined[k].recipes.includes(rec.name))combined[k].recipes.push(rec.name)})}});const cats={produce:[],protein:[],dairy:[],pantry:[],other:[]};const PW='spinach,tomato,onion,garlic,pepper,carrot,celery,zucchini,cucumber,avocado,lime,lemon,basil,cilantro,parsley,thyme,rosemary,mint,ginger,mushroom,broccoli,bean sprout,cabbage,lettuce,potato,eggplant,cauliflower,orange,green onion,green bean,pea,corn,olive,kale,sweet potato,romaine,snap pea,dill'.split(',');const PR='chicken,beef,lamb,salmon,fish,shrimp,tofu,duck,egg,ground,pork,bacon,tuna,anchovy'.split(',');const DA='cream,cheese,butter,milk,yogurt,parmesan,mozzarella,cheddar,feta,sour cream,ricotta,gruyere'.split(',');for(const[k,v]of Object.entries(combined)){const n=k;if(PW.some(w=>n.includes(w)))cats.produce.push(v);else if(PR.some(w=>n.includes(w)))cats.protein.push(v);else if(DA.some(w=>n.includes(w)))cats.dairy.push(v);else if('salt,pepper,oil,sugar,flour,cornstarch,breadcrumb,seasoning,cumin,paprika,turmeric,oregano,curry,chili,soy sauce,fish sauce,vinegar,honey,paste,broth,wine,mirin,allspice,nutmeg,cinnamon,garam masala,miso,hoisin,bbq sauce,tamarind,vodka,sesame'.split(',').some(w=>n.includes(w)))cats.pantry.push(v);else cats.other.push(v)}const CN={produce:'🥬 Produce',protein:'🥩 Protein',dairy:'🧀 Dairy',pantry:'🫙 Pantry',other:'📦 Other'};let html=`<h2>Shopping List</h2><p class="shop-sub">${getWeekLabel()} — ${days.map(d=>DN[d]).join(', ')}</p>`;for(const[cat,items]of Object.entries(cats)){if(!items.length)continue;html+=`<div class="shop-section"><h4>${CN[cat]}</h4>`;items.forEach(item=>{html+=`<div class="shop-item" data-recipes="${item.recipes.join('|||')}"><div class="shop-check">✓</div><span>${item.name} — ${aggregateQty(item.qty)}</span></div>`});html+=`</div>`}mod.innerHTML=html;attachShopListeners(mod);ov.classList.add('open')}
+
+// LONG-PRESS ON SHOP ITEMS
+function attachShopListeners(mod){mod.querySelectorAll('.shop-item').forEach(item=>{let timer=null,lp=false;const start=()=>{lp=false;timer=setTimeout(()=>{lp=true;showRecipeTip(item)},500)};const end=()=>{clearTimeout(timer);if(!lp)item.classList.toggle('done')};const cancel=()=>{clearTimeout(timer)};item.addEventListener('touchstart',start,{passive:true});item.addEventListener('touchend',e=>{e.preventDefault();end()});item.addEventListener('touchmove',cancel,{passive:true});item.addEventListener('mousedown',start);item.addEventListener('mouseup',end);item.addEventListener('mouseleave',cancel)})}
+function showRecipeTip(el){document.querySelectorAll('.recipe-tip').forEach(t=>t.remove());const recipes=[...new Set((el.dataset.recipes||'').split('|||'))].filter(Boolean);if(!recipes.length)return;const tip=document.createElement('div');tip.className='recipe-tip';tip.innerHTML='<strong>Used in:</strong><br>'+recipes.map(r=>'• '+r).join('<br>');el.style.position='relative';el.appendChild(tip);const dismiss=()=>{tip.remove();document.removeEventListener('touchstart',dismiss)};setTimeout(()=>document.addEventListener('touchstart',dismiss,{once:true}),10);setTimeout(dismiss,4000)}
 
 // WEEK TEMPLATES
 let weekTemplates=[];
@@ -1458,7 +1477,7 @@ function openTplModal(){
   // List templates
   if(weekTemplates.length){
     html+=weekTemplates.map((t,i)=>{
-      const preview=DAYS.map(d=>{const rid=t.plan[d];const rec=rid?R.find(r=>r.id===rid):null;return rec?DN[d].slice(0,3)+': '+rec.name:null}).filter(Boolean).join(' · ');
+      const preview=DAYS.map(d=>{const v=t.plan[d];const rid=v?.id||v;const rec=rid?R.find(r=>r.id===rid):null;return rec?DN[d].slice(0,3)+': '+rec.name:null}).filter(Boolean).join(' · ');
       const mealCount=DAYS.filter(d=>t.plan[d]).length;
       return `<div class="tpl-item"><div class="tpl-info" onclick="loadTemplate(${i})"><div class="tpl-name">${t.name}</div><div class="tpl-preview">${mealCount} meals — ${preview||'Empty'}</div></div><button class="tpl-del" onclick="event.stopPropagation();delTemplate(${i})" title="Delete">×</button></div>`;
     }).join('');
@@ -1484,7 +1503,7 @@ function loadTemplate(idx){
   const tpl=weekTemplates[idx];
   if(!tpl)return;
   const wp=getWeekPlan();
-  DAYS.forEach(d=>wp[d]=tpl.plan[d]||null);
+  DAYS.forEach(d=>{const v=tpl.plan[d];if(!v)wp[d]=null;else if(typeof v==='number'){const rec=R.find(r=>r.id===v);wp[d]={id:v,portions:rec?rec.servings:4}}else wp[d]=v});
   sv();
   document.getElementById('tplOv').classList.remove('open');
   renderWeek();
