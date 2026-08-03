@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#1a1a16;--card:#252520;--card2:#2e2e27;--accent:#6DBE45;--green:#4CAF50;--blue:#00b4d8;--gold:#F2C94C;--text:#f0ece4;--muted:#8a8a7a;--dim:#3a3a32;--dim2:#2e2e27;--radius:22px}
+:root{--bg:#1a1a16;--card:#252520;--card2:#2e2e27;--accent:#6DBE45;--green:#4CAF50;--blue:#00b4d8;--gold:#F2C94C;--danger:#E5533D;--text:#f0ece4;--muted:#8a8a7a;--dim:#3a3a32;--dim2:#2e2e27;--radius:22px}
 html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 body{display:flex;flex-direction:column;align-items:center;max-width:480px;margin:0 auto;position:relative}
 .header{width:100%;padding:14px 20px 8px;padding-top:max(14px,env(safe-area-inset-top,14px));display:flex;align-items:center;justify-content:space-between;z-index:100}
@@ -71,7 +71,7 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 .actions{display:flex;gap:14px;margin-top:14px;z-index:50}
 .abtn{width:50px;height:50px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.12s;background:transparent;color:inherit;font-size:17px}
 .abtn:active{transform:scale(.85)}
-.bn{border-color:var(--accent);color:var(--accent)}.bf{border-color:var(--gold);color:var(--gold)}.bf.on{background:var(--gold);color:#fff}
+.bn{border-color:var(--danger);color:var(--danger)}.bf{border-color:var(--gold);color:var(--gold)}.bf.on{background:var(--gold);color:#fff}
 .bs{border-color:var(--blue);color:var(--blue)}.bl{border-color:var(--green);color:var(--green)}
 .bflag{width:34px;height:34px;border-color:var(--muted);color:var(--muted);border-width:1.5px;align-self:center}.bflag.flagged{border-color:#c0392b;color:#c0392b;background:rgba(192,57,43,.15)}
 /* COOKBOOK */
