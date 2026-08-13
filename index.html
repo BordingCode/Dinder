@@ -1605,7 +1605,7 @@ function renderWeek(){
 function rmM(day){getWeekPlan()[day]=null;sv();renderWeek()}
 function toggleSelMode(){selMode=!selMode;selectedDays.clear();document.getElementById('selBtn').classList.toggle('sel',selMode);document.getElementById('shopBtn').style.display='none';renderWeek()}
 function clearWeek(){const wp=getWeekPlan();DAYS.forEach(d=>wp[d]=null);sv();renderWeek()}
-function autoFillWeek(){const wp=getWeekPlan();const pool=saved.length?[...saved]:R.slice(0,50);const usedIds=new Set(DAYS.map(d=>wp[d]?.id).filter(Boolean));const available=shuffleArray(pool.filter(r=>!usedIds.has(r.id)));let ai=0;DAYS.forEach(d=>{if(!wp[d]&&ai<available.length){wp[d]={id:available[ai].id,portions:available[ai].servings};ai++}});sv();renderWeek()}
+function autoFillWeek(){const wp=getWeekPlan();const pool=saved.length?[...saved]:shuffleArray(R.slice()).slice(0,200);const usedIds=new Set(DAYS.map(d=>wp[d]?.id).filter(Boolean));const available=shuffleArray(pool.filter(r=>!usedIds.has(r.id)));let ai=0;DAYS.forEach(d=>{if(!wp[d]&&ai<available.length){wp[d]={id:available[ai].id,portions:available[ai].servings};ai++}});sv();renderWeek()}
 function adjPlanPortion(day,delta){const wp=getWeekPlan();if(!wp[day])return;wp[day].portions=Math.max(1,Math.min(20,wp[day].portions+delta));sv();renderWeek()}
 
 // PICKER
