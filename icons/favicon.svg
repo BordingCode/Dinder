@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<rect width="100" height="100" rx="20" fill="#1a1a16"/>
+<g transform="translate(7,9) scale(0.86)">
+<svg viewBox="0 0 100 82" width="100" height="82">
+<defs>
+<linearGradient id="flameG" x1=".5" y1="1" x2=".5" y2="0"><stop offset="0%" stop-color="#E8723A"/><stop offset="100%" stop-color="#F2C94C"/></linearGradient>
+<linearGradient id="flameIn" x1=".5" y1="1" x2=".5" y2="0"><stop offset="0%" stop-color="#F2C94C"/><stop offset="100%" stop-color="#FFF8E0"/></linearGradient>
+<linearGradient id="panG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8b8b8"/><stop offset="100%" stop-color="#686868"/></linearGradient>
+</defs>
+<path d="M54 80 C32 80 18 70 22 56 C26 44 36 36 46 30 C50 28 54 26 56 26 C58 26 62 28 66 32 C76 40 86 50 86 60 C86 72 74 80 54 80Z" fill="url(#flameG)"/>
+<path d="M54 80 C40 80 30 72 32 62 C34 52 42 44 50 38 C52 36 55 34 56 34 C57 34 60 36 62 40 C68 48 74 56 74 64 C74 74 66 80 54 80Z" fill="url(#flameIn)" opacity=".55"/>
+<g transform="translate(0,-6) rotate(12,56,38)"><path d="M30 27 L82 27 L80 31 L74 46 L74 50 L38 50 L38 46 L32 31Z" fill="url(#panG)"/><path d="M38 46 L74 46 L74 50 L38 50Z" fill="#E8723A" opacity=".3"/><path d="M38 50 L74 50 L74 52 L38 52Z" fill="#555"/><line x1="38" y1="52" x2="74" y2="52" stroke="#444" stroke-width=".6"/><path d="M29 25.5 L83 25.5 L82 28 L30 28Z" fill="#ccc"/><line x1="29" y1="25.5" x2="83" y2="25.5" stroke="#ddd" stroke-width=".7"/><path d="M33 31 L79 31 L74.5 44 L38.5 44Z" fill="#888" opacity=".2"/><rect x="22" y="30" width="12" height="14" rx="1.5" fill="#808080" stroke="#6a6a6a" stroke-width=".5"/><circle cx="28" cy="34" r="1.5" fill="#aaa" stroke="#666" stroke-width=".5"/><circle cx="28" cy="40" r="1.5" fill="#aaa" stroke="#666" stroke-width=".5"/><rect x="2" y="33" width="21" height="6" rx="3" fill="#777"/><line x1="3" y1="33" x2="23" y2="33" stroke="#999" stroke-width=".5"/><line x1="3" y1="39" x2="23" y2="39" stroke="#555" stroke-width=".5"/><line x1="8" y1="33.5" x2="8" y2="38.5" stroke="#8a8" stroke-width=".5" opacity=".5"/><line x1="12" y1="33.5" x2="12" y2="38.5" stroke="#8a8" stroke-width=".5" opacity=".5"/><line x1="16" y1="33.5" x2="16" y2="38.5" stroke="#8a8" stroke-width=".5" opacity=".5"/><circle cx="5.5" cy="36" r="1.8" fill="none" stroke="#999" stroke-width=".7"/></g>
+<path d="M28 18 C26 14 26 10 28 6 C29 3 31 3 32 6 C33 10 32 14 31 18Z" fill="url(#flameG)" opacity=".65"/>
+<path d="M34 15 C33 12 33 9 34 5 C35 3 36 3 37 6 C37 9 37 12 36 16Z" fill="url(#flameIn)" opacity=".45"/>
+<path d="M78 28 C77 24 77 20 78 16 C79 13 80 13 81 16 C82 20 81 24 80 28Z" fill="url(#flameG)" opacity=".55"/>
+<path d="M82 26 C81 23 82 20 83 16 C83 14 84 14 85 17 C85 20 84 24 83 27Z" fill="url(#flameIn)" opacity=".35"/>
+</svg>
+</g>
+</svg>

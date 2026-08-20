@@ -1,0 +1,17 @@
+{
+    "name": "Dinder",
+    "short_name": "Dinder",
+    "description": "Swipe dig frem til aftensmaden",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#1a1a16",
+    "theme_color": "#1a1a16",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "icons/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
