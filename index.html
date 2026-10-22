@@ -291,6 +291,7 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 
 <div class="screen plan-screen hidden" id="scrPlan">
   <h1>Meal Planner</h1>
+  <div class="cook-count" id="cookCount" style="text-align:center;font-size:13px;color:var(--muted);margin:-4px 0 8px"></div>
   <div class="week-nav">
     <button onclick="changeWeek(-1)">‹</button>
     <div class="wn-label"><div class="wn-title" id="wnTitle">This Week</div><div class="wn-dates" id="wnDates"></div></div>
@@ -1455,10 +1456,15 @@ function im(u,r){const a=norm(u),b=norm(r);if(b.includes(a)||a.includes(b))retur
 function sc(rec,ui){if(!ui.length)return{s:.5,m:[],x:rec.ing.map(i=>i.n)};let m=[],u=new Set();for(const i of ui)for(let j=0;j<rec.ing.length;j++){if(!u.has(j)&&im(i.name,rec.ing[j].n)){m.push(rec.ing[j].n);u.add(j);break}}const c=rec.ing.filter(i=>!SKIP.includes(i.n.toLowerCase())),cm=m.filter(x=>!SKIP.includes(x.toLowerCase()));return{s:c.length?cm.length/c.length:0,m,x:rec.ing.filter((_,i)=>!u.has(i)).map(i=>i.n)}}
 
 // SHUFFLE
+const SEASON_COLD=/stew|braise|roast|soup|chili|casserole|pot pie|goulash|bourguignon|rendang|ragu|bolognese|lasagn|cassoulet|risotto|dumpling|galette des rois|gratin|cottage pie|shepherd|porridge|pho\b|ramen|pot roast|mulled|fondue/i;
+const SEASON_WARM=/salad|grill|bbq|barbecue|gazpacho|ceviche|cold|slaw|summer|poke|skewer|kebab|caprese|tzatziki|wrap|taco|sushi|lemon|citrus|watermelon|smoothie|bowl|ice cream|sorbet|tandoori/i;
+function seasonLean(r){const t=SEASON_COLD.test(r.name)?1:0;const w=(SEASON_WARM.test(r.name)||r.time<=20)?1:0;return t-w}
+function seasonScore(r){const m=new Date().getMonth();const warm=m>=4&&m<=7,cold=m>=10||m<=1;const l=seasonLean(r);return warm?-l:cold?l:0}
+function seasonNudge(a){return a.map(r=>[r,seasonScore(r)]).sort((x,y)=>y[1]-x[1]).map(x=>x[0])}
 function shuffleArray(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
 // START
-function startSwipe(){hasSearched=true;const nameQ=(document.getElementById('nameSearch').value||'').trim().toLowerCase();userIngs=[];document.querySelectorAll('.ing-row').forEach(r=>{const n=r.querySelector('.ing-name').value.trim();if(n)userIngs.push({name:n})});filters=new Set();document.querySelectorAll('.chip.active[data-f]').forEach(c=>filters.add(c.dataset.f));const cuisines=new Set();document.querySelectorAll('.chip.active[data-c]').forEach(c=>cuisines.add(c.dataset.c));maxTime=+document.getElementById('timeR').value;const all=R.filter(r=>{if(skipped.has(r.id))return false;if(nameQ&&!r.name.toLowerCase().includes(nameQ))return false;if(maxTime<120&&r.time>maxTime)return false;for(const f of filters)if(!r.tags.includes(f))return false;if(cuisines.size){const rc=detectCuisine(r.name);if(!rc||!cuisines.has(rc))return false}return true}).map(r=>{const s=sc(r,userIngs);const nameBonus=nameQ&&r.name.toLowerCase().includes(nameQ)?1:0;return{...r,ms:s.s,mi:s.m,mx:s.x,nb:nameBonus}});if(nameQ){all.sort((a,b)=>{const aExact=a.name.toLowerCase()===nameQ?2:a.name.toLowerCase().startsWith(nameQ)?1:0;const bExact=b.name.toLowerCase()===nameQ?2:b.name.toLowerCase().startsWith(nameQ)?1:0;return bExact-aExact});filtered=all}else{const tiers=[[],[],[]];all.forEach(r=>{const p=r.ms*100;if(p>=60)tiers[0].push(r);else if(p>=30)tiers[1].push(r);else tiers[2].push(r)});filtered=tiers.flatMap(t=>shuffleArray(t))}filterShortcuts=filtered.length===0&&filters.size?[...filters].map(f=>{const others=[...filters].filter(x=>x!==f);const c=R.filter(r=>{if(skipped.has(r.id))return false;if(nameQ&&!r.name.toLowerCase().includes(nameQ))return false;if(maxTime<120&&r.time>maxTime)return false;for(const o of others)if(!r.tags.includes(o))return false;if(cuisines.size){const rc=detectCuisine(r.name);if(!rc||!cuisines.has(rc))return false}return true}).length;return{f,count:c}}).filter(s=>s.count>0).sort((a,b)=>b.count-a.count):[];curIdx=0;go('swipe');renderCards()}
+function startSwipe(){hasSearched=true;const nameQ=(document.getElementById('nameSearch').value||'').trim().toLowerCase();userIngs=[];document.querySelectorAll('.ing-row').forEach(r=>{const n=r.querySelector('.ing-name').value.trim();if(n)userIngs.push({name:n})});filters=new Set();document.querySelectorAll('.chip.active[data-f]').forEach(c=>filters.add(c.dataset.f));const cuisines=new Set();document.querySelectorAll('.chip.active[data-c]').forEach(c=>cuisines.add(c.dataset.c));maxTime=+document.getElementById('timeR').value;const all=R.filter(r=>{if(skipped.has(r.id))return false;if(nameQ&&!r.name.toLowerCase().includes(nameQ))return false;if(maxTime<120&&r.time>maxTime)return false;for(const f of filters)if(!r.tags.includes(f))return false;if(cuisines.size){const rc=detectCuisine(r.name);if(!rc||!cuisines.has(rc))return false}return true}).map(r=>{const s=sc(r,userIngs);const nameBonus=nameQ&&r.name.toLowerCase().includes(nameQ)?1:0;return{...r,ms:s.s,mi:s.m,mx:s.x,nb:nameBonus}});if(nameQ){all.sort((a,b)=>{const aExact=a.name.toLowerCase()===nameQ?2:a.name.toLowerCase().startsWith(nameQ)?1:0;const bExact=b.name.toLowerCase()===nameQ?2:b.name.toLowerCase().startsWith(nameQ)?1:0;return bExact-aExact});filtered=all}else{const tiers=[[],[],[]];all.forEach(r=>{const p=r.ms*100;if(p>=60)tiers[0].push(r);else if(p>=30)tiers[1].push(r);else tiers[2].push(r)});filtered=tiers.flatMap(t=>seasonNudge(shuffleArray(t)))}filterShortcuts=filtered.length===0&&filters.size?[...filters].map(f=>{const others=[...filters].filter(x=>x!==f);const c=R.filter(r=>{if(skipped.has(r.id))return false;if(nameQ&&!r.name.toLowerCase().includes(nameQ))return false;if(maxTime<120&&r.time>maxTime)return false;for(const o of others)if(!r.tags.includes(o))return false;if(cuisines.size){const rc=detectCuisine(r.name);if(!rc||!cuisines.has(rc))return false}return true}).length;return{f,count:c}}).filter(s=>s.count>0).sort((a,b)=>b.count-a.count):[];curIdx=0;go('swipe');renderCards()}
 function resetSkipped(){skipped=new Set();svSkip();startSwipe()}
 function filterLabel(f){const el=document.querySelector('.chip[data-f="'+f+'"]');return el?el.textContent.trim():f}
 function removeFilterAndRetry(f){document.querySelectorAll('.chip.active[data-f]').forEach(c=>{if(c.dataset.f===f)c.classList.remove('active')});startSwipe()}
@@ -1544,6 +1550,8 @@ function openCook(id){
   // Wake Lock
   if('wakeLock' in navigator)navigator.wakeLock.request('screen').then(l=>{wakeLock=l}).catch(()=>{});
 }
+function logCooked(r){try{const l=JSON.parse(localStorage.getItem('ds8cooked')||'[]');l.push({id:r.id,date:new Date().toISOString().slice(0,10)});localStorage.setItem('ds8cooked',JSON.stringify(l))}catch(e){}showCookCount()}
+function showCookCount(){let n=0;try{n=JSON.parse(localStorage.getItem('ds8cooked')||'[]').length}catch(e){}const el=document.getElementById('cookCount');if(el)el.textContent=n?'🍳 '+n+(n===1?' dish cooked':' dishes cooked'):''}
 function closeCook(){
   document.getElementById('cookOv').classList.remove('open');
   if(wakeLock){wakeLock.release();wakeLock=null}
@@ -1557,7 +1565,7 @@ function renderCookStep(){
   const prev=document.getElementById('cookPrev');
   prev.disabled=cookIdx===0;
   const next=document.getElementById('cookNext');
-  if(cookIdx===total-1){next.textContent='Done!';next.className='cook-done';next.onclick=()=>closeCook()}
+  if(cookIdx===total-1){next.textContent='Done!';next.className='cook-done';next.onclick=()=>{logCooked(cookRec);closeCook()}}
   else{next.textContent='Next Step';next.className='cook-next';next.onclick=()=>cookStep(1)}
 }
 function cookStep(d){cookIdx=Math.max(0,Math.min(cookRec.steps.length-1,cookIdx+d));renderCookStep()}
@@ -1590,6 +1598,7 @@ function formatDateShort(d){return d.getDate()+'/'+(d.getMonth()+1)}
 function formatDateRange(dates){const s=dates[0],e=dates[6];const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return s.getDate()+' '+months[s.getMonth()]+' — '+e.getDate()+' '+months[e.getMonth()]+' '+e.getFullYear()}
 function getWeekLabel(){if(weekOffset===0)return'This Week';if(weekOffset===1)return'Next Week';if(weekOffset===-1)return'Last Week';return(weekOffset>0?'+':'')+weekOffset+' Weeks'}
 function renderWeek(){
+  showCookCount();
   const g=document.getElementById('weekGrid');g.innerHTML='';
   const dates=getWD();const wp=getWeekPlan();
   document.getElementById('wnTitle').textContent=getWeekLabel();
@@ -1610,7 +1619,7 @@ function renderWeek(){
 function rmM(day){getWeekPlan()[day]=null;sv();renderWeek()}
 function toggleSelMode(){selMode=!selMode;selectedDays.clear();document.getElementById('selBtn').classList.toggle('sel',selMode);document.getElementById('shopBtn').style.display='none';renderWeek()}
 function clearWeek(){const wp=getWeekPlan();DAYS.forEach(d=>wp[d]=null);sv();renderWeek()}
-function autoFillWeek(){const wp=getWeekPlan();const pool=saved.length?[...saved]:shuffleArray(R.slice()).slice(0,200);const usedIds=new Set(DAYS.map(d=>wp[d]?.id).filter(Boolean));const available=shuffleArray(pool.filter(r=>!usedIds.has(r.id)));let ai=0;DAYS.forEach(d=>{if(!wp[d]&&ai<available.length){wp[d]={id:available[ai].id,portions:available[ai].servings};ai++}});sv();renderWeek()}
+function autoFillWeek(){const wp=getWeekPlan();const pool=saved.length?[...saved]:shuffleArray(R.slice()).slice(0,200);const usedIds=new Set(DAYS.map(d=>wp[d]?.id).filter(Boolean));const available=seasonNudge(shuffleArray(pool.filter(r=>!usedIds.has(r.id))));let ai=0;DAYS.forEach(d=>{if(!wp[d]&&ai<available.length){wp[d]={id:available[ai].id,portions:available[ai].servings};ai++}});sv();renderWeek()}
 function adjPlanPortion(day,delta){const wp=getWeekPlan();if(!wp[day])return;wp[day].portions=Math.max(1,Math.min(20,wp[day].portions+delta));sv();renderWeek()}
 
 // PICKER
