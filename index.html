@@ -206,7 +206,7 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 .cook-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;padding:4px 8px}
 .cook-progress{height:3px;background:var(--dim);width:100%}
 .cook-progress-bar{height:100%;background:var(--accent);transition:width .3s}
-.cook-body{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cook-body{position:relative;flex:1;display:flex;flex-direction:column;overflow:hidden}
 .cook-step-area{flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 24px 16px;overflow-y:auto}
 .cook-step-num{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
 .cook-step-text{font-size:20px;line-height:1.6;color:var(--text)}
@@ -218,6 +218,10 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 .cook-prev-step.show{display:block}
 @keyframes cookIn{from{opacity:0;transform:translateX(var(--cin,40px))}to{opacity:1;transform:none}}
 .cook-slide{animation:cookIn .2s ease-out}
+.cook-finish{display:none;position:absolute;inset:0;background:var(--bg);z-index:5;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;gap:14px;animation:cookIn .6s ease-out}
+.cook-finish.show{display:flex}
+.cook-finish-name{font-family:'Playfair Display',serif;font-size:26px}
+.cook-finish-line{font-size:16px;color:#bbb;min-height:1.4em}
 @media (prefers-reduced-motion:reduce){.cook-slide{animation:none}}
 .cook-ing-toggle{background:none;border:1.5px solid var(--dim);border-radius:14px;color:var(--muted);font-size:12px;padding:8px 16px;cursor:pointer;font-family:inherit;margin-top:16px;align-self:flex-start;transition:.15s}
 .cook-ing-toggle.open{border-color:var(--accent);color:var(--accent)}
@@ -344,6 +348,7 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
       <button class="cook-ing-toggle" id="cookIngToggle" onclick="toggleCookIngs()">Show Ingredients</button>
       <div class="cook-ing-list" id="cookIngList"></div>
     </div>
+    <div class="cook-finish" id="cookFinish" onclick="finishCook()"><div class="cook-finish-name" id="cookFinishName"></div><div class="cook-finish-line" id="cookFinishLine"></div></div>
     <div class="cook-nav">
       <button class="cook-prev" id="cookPrev" onclick="cookStep(-1)">Previous</button>
       <button class="cook-next" id="cookNext" onclick="cookStep(1)">Next Step</button>
@@ -1568,6 +1573,10 @@ function openCook(id){
 }
 function logCooked(r){try{const l=JSON.parse(localStorage.getItem('ds8cooked')||'[]');l.push({id:r.id,date:new Date().toISOString().slice(0,10)});localStorage.setItem('ds8cooked',JSON.stringify(l))}catch(e){}showCookCount()}
 function showCookCount(){let n=0;try{n=JSON.parse(localStorage.getItem('ds8cooked')||'[]').length}catch(e){}const el=document.getElementById('cookCount');if(el)el.textContent=n?'🍳 '+n+(n===1?' dish cooked':' dishes cooked'):''}
+let finishTimer=null;
+function finishLine(prev,r){const n=prev.length+1;if(n===1)return 'Your first dish ever';const cu=detectCuisine(r.name);if(cu&&!prev.some(e=>{const q=R.find(x=>x.id===e.id);return q&&detectCuisine(q.name)===cu}))return 'First time you cook '+cu;const wk=new Date(Date.now()-6*864e5).toISOString().slice(0,10);if(prev.filter(e=>e.date>=wk).length===1)return 'Second dish this week';return 'Dish no. '+n}
+function doneCook(){let prev=[];try{prev=JSON.parse(localStorage.getItem('ds8cooked')||'[]')}catch(e){}const line=finishLine(prev,cookRec);logCooked(cookRec);document.getElementById('cookFinishName').textContent=cookRec.name;document.getElementById('cookFinishLine').textContent=line;document.getElementById('cookFinish').classList.add('show');clearTimeout(finishTimer);finishTimer=setTimeout(finishCook,2500)}
+function finishCook(){clearTimeout(finishTimer);const f=document.getElementById('cookFinish');if(!f.classList.contains('show'))return;f.classList.remove('show');closeCook(true)}
 function closeCook(done){
   if(!navApplying&&navCur.c){history.go(done&&navCur.d?-2:-1);return}
   document.getElementById('cookOv').classList.remove('open');
@@ -1586,7 +1595,7 @@ function renderCookStep(){
   const prev=document.getElementById('cookPrev');
   prev.disabled=cookIdx===0;
   const next=document.getElementById('cookNext');
-  if(cookIdx===total-1){next.textContent='Done!';next.className='cook-done';next.onclick=()=>{logCooked(cookRec);closeCook(true)}}
+  if(cookIdx===total-1){next.textContent='Done!';next.className='cook-done';next.onclick=()=>doneCook()}
   else{next.textContent='Next Step';next.className='cook-next';next.onclick=()=>cookStep(1)}
 }
 function cookStep(d){const n=Math.max(0,Math.min(cookRec.steps.length-1,cookIdx+d));if(n===cookIdx)return;cookIdx=n;cookSlide=d;renderCookStep();cookSlide=0}
