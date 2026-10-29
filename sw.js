@@ -1,4 +1,4 @@
-const CACHE = 'dinder-v8';
+const CACHE = 'dinder-v9';
 const ASSETS = [
   './',
   'index.html',

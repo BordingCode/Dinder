@@ -224,6 +224,12 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
 .cook-finish-name{font-family:'Playfair Display',serif;font-size:26px}
 .cook-finish-line{font-size:16px;color:#bbb;min-height:1.4em}
 @media (prefers-reduced-motion:reduce){.cook-slide{animation:none}}
+.cook-why{margin-top:16px;display:none}.cook-why.show{display:block}
+.cook-why .cw-q{font-size:15px;font-weight:600;margin-bottom:8px}
+.cook-why .cw-opt{display:block;width:100%;text-align:left;margin-bottom:8px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--dim);background:var(--card);color:var(--text);font-size:15px;font-family:inherit;cursor:pointer}
+.cook-why .cw-opt.right{border-color:var(--green)}
+.cook-why .cw-ans{font-size:15px;line-height:1.55;color:var(--text);padding:12px 14px;border-radius:12px;background:var(--card);border-left:3px solid var(--gold)}
+.cook-why .cw-skip{background:none;border:none;color:var(--muted);font-size:13px;font-family:inherit;cursor:pointer;padding:6px 0;text-decoration:underline}
 .cook-ing-toggle{background:none;border:1.5px solid var(--dim);border-radius:14px;color:var(--muted);font-size:12px;padding:8px 16px;cursor:pointer;font-family:inherit;margin-top:16px;align-self:flex-start;transition:.15s}
 .cook-ing-toggle.open{border-color:var(--accent);color:var(--accent)}
 .cook-ing-list{padding:12px 0;display:none}
@@ -347,6 +353,7 @@ body{display:flex;flex-direction:column;align-items:center;max-width:480px;margi
       <div class="cook-prev-step" id="cookPrevStep"></div>
       <div class="cook-step-num" id="cookStepNum"></div>
       <div class="cook-step-text" id="cookStepText"></div>
+      <div class="cook-why" id="cookWhy"></div>
       <button class="cook-ing-toggle" id="cookIngToggle" onclick="toggleCookIngs()">Show Ingredients</button>
       <div class="cook-ing-list" id="cookIngList"></div>
     </div>
@@ -1554,6 +1561,22 @@ function tFM(id,b){if(favs.has(id)){favs.delete(id);b.classList.remove('on');b.t
 function sMS(id,b){if(!saved.find(s=>s.id===id)){const r=R.find(x=>x.id===id);if(r)saved.push(r);sv()}b.textContent='✓ Saved';b.style.borderColor='var(--green)'}
 
 // COOK MODE
+const SEAR_RE=/\b(sear|seared|brown)\b[^.]*\b(beef|chicken|steak|pork|lamb|meat|mince|sausage|turkey|duck)|\b(beef|chicken|steak|pork|lamb|meat|turkey|duck)\b[^.]*\bsear/i;
+function whyDone(){try{return localStorage.getItem('ds9why')==='1'}catch(e){return true}}
+function whyMark(){try{localStorage.setItem('ds9why','1')}catch(e){}}
+function renderWhy(step){
+  const w=document.getElementById('cookWhy');w.classList.remove('show');w.innerHTML='';
+  if(whyDone()||!SEAR_RE.test(step))return;
+  const opts=['It seals the juices in','It builds flavour and a golden crust','It holds the meat together'];
+  w.innerHTML='<div class="cw-q">Why do we brown the meat first? Take a guess.</div>'+opts.map((o,i)=>`<button class="cw-opt" data-i="${i}">${o}</button>`).join('')+'<button class="cw-skip">Skip</button>';
+  w.classList.add('show');
+  w.querySelector('.cw-skip').onclick=()=>{whyMark();w.classList.remove('show');w.innerHTML=''};
+  w.querySelectorAll('.cw-opt').forEach(b=>b.onclick=()=>{
+    whyMark();const i=+b.dataset.i;
+    const lead=i===1?'Yes. ':i===0?'Almost everyone thinks that. ':'Not quite. ';
+    w.innerHTML=`<div class="cw-ans">${lead}Browning builds flavour and a crust (the Maillard reaction). It does not seal anything in: browned meat loses as much juice as unbrowned, sometimes more. So brown it for the taste.</div>`;
+  });
+}
 let cookRec=null,cookIdx=0,cookDoneIngs=new Set(),wakeLock=null;
 function openCook(id){
   if(!navApplying&&!navCur.c)navPush({c:true});
@@ -1590,6 +1613,7 @@ function renderCookStep(){
   const steps=cookRec.steps;const total=steps.length;
   document.getElementById('cookStepNum').textContent=`Step ${cookIdx+1} of ${total}`;
   document.getElementById('cookStepText').textContent=steps[cookIdx];
+  renderWhy(steps[cookIdx]);
   const pv=document.getElementById('cookPrevStep');const pt=cookIdx>0?steps[cookIdx-1]:'';
   pv.textContent=pt?'Before: '+(pt.length>90?pt.slice(0,87).trimEnd()+'…':pt):'';pv.classList.toggle('show',!!pt);
   if(cookSlide){const a=document.querySelector('.cook-step-area');[document.getElementById('cookStepText'),document.getElementById('cookStepNum'),pv].forEach(el=>{el.style.setProperty('--cin',cookSlide>0?'40px':'-40px');el.classList.remove('cook-slide');void el.offsetWidth;el.classList.add('cook-slide')})}
